@@ -6,7 +6,7 @@ from time import time, ctime
 from collections import namedtuple
 from colorama import Fore, Style
 from pprint import pprint
-
+import reflex as rx
 
 def main():
     # Criação de um conjunto de argmentos que viabiliza ao utlizador selecionar o modo de jogo que pretende.
