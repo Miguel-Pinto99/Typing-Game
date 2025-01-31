@@ -3,6 +3,8 @@
 import reflex as rx
 from .components.header import header
 from .components.game_form import game_form
+
+
 class State(rx.State):
     """The app state."""
 
@@ -16,6 +18,7 @@ def index() -> rx.Component:
         game_form(),
         align="center",
     )
+
 
 app = rx.App()
 app.add_page(index)
