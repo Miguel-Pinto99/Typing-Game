@@ -5,12 +5,6 @@ from .components.header import header
 from .components.game_form import game_form
 
 
-class State(rx.State):
-    """The app state."""
-
-    ...
-
-
 def index() -> rx.Component:
     # Welcome Page (Index)
     return rx.vstack(
