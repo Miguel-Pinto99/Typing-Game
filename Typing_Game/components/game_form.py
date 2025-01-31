@@ -144,60 +144,75 @@ class GameFormState(rx.State):
 
 
 def game_form() -> rx.Component:
-    return rx.hstack(
-        rx.card(
-            rx.grid(
-                rx.text("Number of letters"),
-                rx.input(
-                    value=GameFormState.letters,
-                    on_change=GameFormState.set_maximum_value,
-                    type="number",
-                    max_width="10em",
+    return rx.center(
+        rx.vstack(
+            rx.hstack(
+                rx.card(
+                    rx.text("Instructions", font_size="1.5em", font_weight="bold"),
+                    rx.text(
+                        "Welcome to the Typing Game! Here are the instructions:",
+                        "1. Enter the number of letters you want to type.",
+                        "2. Enter the duration for the game (in seconds).",
+                        "3. Click 'Start Game' to begin.",
+                        "4. Type the displayed letter as quickly and accurately as possible.",
+                        "5. The game will end when the time is up.",
+                        "6. Your performance will be displayed at the end of the game.",
+                        align="left",
+                        spacing="1",
+                        max_width="20em",
+                    ),
                 ),
-                rx.text("Duration"),
-                rx.input(
-                    value=GameFormState.duration,
-                    on_change=GameFormState.set_duration,
-                    type="number",
-                    max_width="10em",
+                rx.card(
+                    rx.text(
+                        GameFormState.key_to_press,
+                        align="center",
+                        spacing="1",
+                        width="30em",
+                        height="10em",
+                        font_size="3em",
+                        font_weight="bold",
+                    )
                 ),
-                class_name="grid-cols-[repeat(2,max-content)]",
-                align="center",
-                spacing="1",
-            )
-        ),
-        rx.card(
-            rx.text("Instructions", font_size="1.5em", font_weight="bold"),
-            rx.text(
-                "Welcome to the Typing Game! Here are the instructions:",
-                "1. Enter the number of letters you want to type.",
-                "2. Enter the duration for the game (in seconds).",
-                "3. Click 'Start Game' to begin.",
-                "4. Type the displayed letter as quickly and accurately as possible.",
-                "5. The game will end when the time is up.",
-                "6. Your performance will be displayed at the end of the game.",
-                align="left",
-                spacing="1",
-                max_width="20em",
+                rx.vstack(
+                    rx.card(
+                        rx.grid(
+                            rx.text("Number of letters"),
+                            rx.input(
+                                value=GameFormState.letters,
+                                on_change=GameFormState.set_maximum_value,
+                                type="number",
+                                max_width="10em",
+                            ),
+                            rx.text("Duration"),
+                            rx.input(
+                                value=GameFormState.duration,
+                                on_change=GameFormState.set_duration,
+                                type="number",
+                                max_width="10em",
+                            ),
+                            class_name="grid-cols-[repeat(2,max-content)]",
+                            align="center",
+                            spacing="1",
+                        )
+                    ),
+                    rx.button(
+                        "Start Game",
+                        variant="solid",
+                        on_click=GameFormState.start_game,
+                        loading=GameFormState.game_doing,
+                    ),
+                ),
             ),
-        ),
-        rx.button(
-            "Start Game",
-            variant="solid",
-            on_click=GameFormState.start_game,
-            loading=GameFormState.game_doing,
-        ),
-        rx.cond(
-            GameFormState.warning_show,
-            render_warning_card(
-                GameFormState,
-                GameFormState.icon_color,
-                GameFormState.icon_tag,
-                GameFormState.message,
-                GameFormState.text_color,
+            rx.cond(
+                GameFormState.warning_show,
+                render_warning_card(
+                    GameFormState,
+                    GameFormState.icon_color,
+                    GameFormState.icon_tag,
+                    GameFormState.message,
+                    GameFormState.text_color,
+                ),
             ),
-        ),
-        rx.text(
-            GameFormState.key_to_press, align="center", spacing="1", max_width="10em"
-        ),
+            align="center",
+        )
     )

@@ -1,4 +1,6 @@
 import reflex as rx
+
+
 def render_warning_card(
     obj_class, icon_color: str, icon_tag: str, message: str, text_color: str
 ) -> rx.Component:
@@ -31,4 +33,3 @@ def dynamic_icon(icon_name: str, icon_color: str):
         ("triangle-alert", rx.icon("triangle-alert", color=icon_color)),
         ("circle-check-big", rx.icon("circle-check-big", color=icon_color)),
     )
-
