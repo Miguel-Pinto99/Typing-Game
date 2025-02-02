@@ -1,9 +1,9 @@
 import reflex as rx
-from .sections import render_warning_card
-import readchar
+from .sections import render_warning_card, render_instructions_card
+
+# import readchar
 import random
 from time import time
-from collections import namedtuple
 from colorama import Fore, Style
 
 
@@ -18,6 +18,7 @@ class GameFormState(rx.State):
     text_color: str = ""
     icon_tag: str = ""
     key_to_press: str = ""
+    key_pressed: str = ""
 
     @rx.event
     def set_maximum_value(self, value: str):
@@ -46,8 +47,7 @@ class GameFormState(rx.State):
         self.text_color = text_color
         self.icon_tag = icon_tag
 
-    rx.event
-
+    @rx.event
     def reset_game(self):
         self.letters = 0
         self.duration = 0
@@ -76,16 +76,13 @@ class GameFormState(rx.State):
         return True
 
     @rx.event
-    def start_game(self):
+    def start_game(self, event) -> None:
         self.game_doing = True
         valid = self.validate_inputs()
         if not valid:
             self.game_doing = False
             return
 
-        Input = namedtuple("Input", ["requested", "received", "duration"])
-        inputs = []
-        readchar.readkey()
         test_start = time()
         time_c = 0
         time_w = 0
@@ -93,17 +90,20 @@ class GameFormState(rx.State):
         number_of_types = 0
         number_of_misses = 0
 
+        if event.key:
+            print(event.key)
+
         while True:
             random_char = chr(random.randint(97, 122))
             self.set_key_to_press(random_char)
             print(Fore.CYAN + "\nType " + str(random_char) + Style.RESET_ALL)
             duration = time()
-            pressed_char = readchar.readkey()
+            pressed_char = "a"
             duration = time() - duration
 
             if time() >= test_start + self.duration:
                 break
-            inputs.append(Input(random_char, pressed_char, duration))
+            # inputs.append(Input(random_char, pressed_char, duration))
 
             if random_char == pressed_char:
                 print(
@@ -142,33 +142,62 @@ class GameFormState(rx.State):
         )
         self.game_doing = False
 
+    # @rx.event
+    # def key_pressed(self, event):
+    #     random_char = self.get_random_char()
+    #     self.set_key_to_press(random_char)
+    #     print(Fore.CYAN + "\nType " + str(random_char) + Style.RESET_ALL)
+    #     duration = time.time()
+    #     pressed_char = event.char
+    #     duration = time.time() - duration
+
+    #     if time.time() >= self.test_start + self.duration:
+    #         return
+    #     self.inputs.append(Input(random_char, pressed_char, duration))
+
+    #     if random_char == pressed_char:
+    #         print(
+    #             "\nYou typed "
+    #             + Fore.GREEN
+    #             + pressed_char
+    #             + Style.RESET_ALL
+    #             + ". "
+    #             + "Correct!"
+    #         )
+    #         self.number_of_hits += 1
+    #         self.number_of_types += 1
+    #         self.time_c += duration
+    #     elif pressed_char == "140":
+    #         self.reset_game()
+    #     else:
+    #         print(
+    #             "\nYou typed "
+    #             + Fore.RED
+    #             + pressed_char
+    #             + Style.RESET_ALL
+    #             + ". "
+    #             + "Wrong!"
+    #         )
+    #         self.number_of_misses += 1
+    #         self.number_of_types += 1
+    #         self.time_w += duration
+
+    def get_random_char(self):
+        return random.choice("abcdefghijklmnopqrstuvwxyz")
+
 
 def game_form() -> rx.Component:
     return rx.center(
         rx.vstack(
             rx.hstack(
-                rx.card(
-                    rx.text("Instructions", font_size="1.5em", font_weight="bold"),
-                    rx.text(
-                        "Welcome to the Typing Game! Here are the instructions:",
-                        "1. Enter the number of letters you want to type.",
-                        "2. Enter the duration for the game (in seconds).",
-                        "3. Click 'Start Game' to begin.",
-                        "4. Type the displayed letter as quickly and accurately as possible.",
-                        "5. The game will end when the time is up.",
-                        "6. Your performance will be displayed at the end of the game.",
-                        align="left",
-                        spacing="1",
-                        max_width="20em",
-                    ),
-                ),
+                render_instructions_card(),
                 rx.card(
                     rx.text(
                         GameFormState.key_to_press,
                         align="center",
                         spacing="1",
-                        width="30em",
-                        height="10em",
+                        width="15em",
+                        height="5em",
                         font_size="3em",
                         font_weight="bold",
                     )
@@ -196,10 +225,21 @@ def game_form() -> rx.Component:
                         )
                     ),
                     rx.button(
-                        "Start Game",
+                        "Start",
                         variant="solid",
-                        on_click=GameFormState.start_game,
+                        on_click=GameFormState.set_key_to_press(
+                            "Press any key to start"
+                        ),
                         loading=GameFormState.game_doing,
+                    ),
+                    rx.button(
+                        "Reset",
+                        variant="solid",
+                        on_click=GameFormState.reset_game,
+                    ),
+                    rx.input(
+                        type="hidden",
+                        on_key_down=GameFormState.key_pressed,
                     ),
                 ),
             ),

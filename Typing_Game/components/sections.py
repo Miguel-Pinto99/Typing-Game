@@ -1,5 +1,14 @@
 import reflex as rx
 
+style1 = {
+    "color": "white",
+    "font_family": "Comic Sans MS",
+    "border_radius": "10px",
+    "background_color": "rgb(107,99,246)",
+    "padding": "10px",
+    "align": "center",
+}
+
 
 def render_warning_card(
     obj_class, icon_color: str, icon_tag: str, message: str, text_color: str
@@ -32,4 +41,34 @@ def dynamic_icon(icon_name: str, icon_color: str):
         icon_name,
         ("triangle-alert", rx.icon("triangle-alert", color=icon_color)),
         ("circle-check-big", rx.icon("circle-check-big", color=icon_color)),
+    )
+
+
+def render_instructions_card():
+    return (
+        rx.card(
+            rx.text("Instructions", style=style1),
+            rx.divider(),
+            rx.spacer(height="10px"),
+            rx.list.ordered(
+                rx.list.item("Enter the number of letters you want to type."),
+                rx.spacer(height="10px"),
+                rx.list.item("Enter the duration for the game (in seconds)."),
+                rx.spacer(height="10px"),
+                rx.list.item("Click 'Start Game' to begin."),
+                rx.spacer(height="10px"),
+                rx.list.item(
+                    "Type the displayed letter as quickly and accurately as possible."
+                ),
+                rx.spacer(height="10px"),
+                rx.list.item("The game will end when the time is up."),
+                rx.spacer(height="10px"),
+                rx.list.item(
+                    "Your performance will be displayed at the end of the game."
+                ),
+                align="left",
+                spacing="1",
+                max_width="20em",
+            ),
+        ),
     )
