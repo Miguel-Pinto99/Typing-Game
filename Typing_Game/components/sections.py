@@ -58,7 +58,7 @@ def render_instructions_card():
                 rx.list.item("Click 'Start Game' to begin."),
                 rx.spacer(height="10px"),
                 rx.list.item(
-                    "Type the displayed letter as quickly and accurately as possible."
+                    "Type the displayed word as quickly and accurately as possible."
                 ),
                 rx.spacer(height="10px"),
                 rx.list.item("The game will end when the time is up."),
@@ -68,7 +68,28 @@ def render_instructions_card():
                 ),
                 align="left",
                 spacing="1",
-                max_width="20em",
+                height="100%",
+                width="100%",
             ),
         ),
+    )
+
+
+def render_results_card(results: list[dict]) -> rx.Component:
+    return rx.card(
+        rx.vstack(
+            rx.text("Results"),
+            rx.divider(),
+            rx.data_list.root(
+                rx.foreach(
+                    results,
+                    lambda item: rx.data_list.item(
+                        rx.data_list.label(item["word"]),
+                        rx.data_list.value(item["time_taken"]),
+                    ),
+                ),
+                align="center",
+                spacing="1",
+            ),
+        )
     )

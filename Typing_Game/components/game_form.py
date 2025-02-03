@@ -1,15 +1,13 @@
 import reflex as rx
-from .sections import render_warning_card, render_instructions_card
-
-# import readchar
+from .sections import render_warning_card, render_instructions_card, render_results_card
 import random
 from time import time
-from colorama import Fore, Style
+from ..data.words import easy_words, medium_words, hard_words
 
 
 class GameFormState(rx.State):
-    letters: int = 0
-    duration: int = 0
+    difficulty: str = ""
+    duration: str = "0"
 
     game_doing: bool = False
     icon_color: str = ""
@@ -17,20 +15,39 @@ class GameFormState(rx.State):
     message: str = ""
     text_color: str = ""
     icon_tag: str = ""
-    key_to_press: str = ""
-    key_pressed: str = ""
+    word_to_write: str = ""
+    wrote_word: str = ""
+    start_time: float = 0
+    time_on_word: float = 0
+    results: list[dict] = []
+    show_results: bool = False
 
     @rx.event
-    def set_maximum_value(self, value: str):
-        self.letters = int(value)
+    def set_difficulty(self, value: str):
+        self.difficulty = value
 
     @rx.event
     def set_duration(self, value: str):
-        self.duration = int(value)
+        self.duration = value
 
     @rx.event
-    def set_key_to_press(self, key: str) -> None:
-        self.key_to_press = key
+    def set_wrote_word(self, value: str):
+        self.wrote_word = value
+
+    @rx.event
+    def set_word_to_write(self) -> None:
+        if self.difficulty == "Easy":
+            word_list = easy_words
+        elif self.difficulty == "Medium":
+            word_list = medium_words
+        elif self.difficulty == "Hard":
+            word_list = hard_words
+        else:
+            raise ValueError("Invalid difficulty")
+
+        word_list_length = len(word_list)
+        random_index = random.randint(0, word_list_length - 1)
+        self.word_to_write = word_list[random_index]
 
     @rx.event
     def set_warning(
@@ -49,141 +66,66 @@ class GameFormState(rx.State):
 
     @rx.event
     def reset_game(self):
-        self.letters = 0
-        self.duration = 0
+        self.difficulty = ""
+        self.duration = "0"
         self.game_doing = False
+        self.icon_color = ""
         self.warning_show = False
         self.message = ""
         self.text_color = ""
         self.icon_tag = ""
-        self.icon_color = ""
-        self.key_to_press = ""
+        self.word_to_write = ""
+        self.wrote_word = ""
+        self.start_time = 0
+        self.time_on_word = 0
+        self.results = []
+        self.show_results = False
 
     @rx.event
     def validate_inputs(self) -> bool:
-        if 0 in [
-            self.letters,
-            self.duration,
-        ]:
+        if "0" == self.duration:
             self.set_warning(
                 True, "orange", "triangle-alert", "Fill all the inputs", "orange"
             )
             return False
-
-        elif self.duration > 60:
-            self.set_warning(True, "orange", "triangle-alert", "Game to long", "orange")
+        elif "" == self.difficulty:
+            self.set_warning(
+                True, "orange", "triangle-alert", "Fill all the inputs", "orange"
+            )
             return False
         return True
 
     @rx.event
-    def start_game(self, event) -> None:
-        self.game_doing = True
-        valid = self.validate_inputs()
-        if not valid:
-            self.game_doing = False
+    def check_answer(self, value) -> None:
+        self.wrote_word = value
+        if time() >= self.start_time + int(self.duration):
+            self.end_game()
             return
 
-        test_start = time()
-        time_c = 0
-        time_w = 0
-        number_of_hits = 0
-        number_of_types = 0
-        number_of_misses = 0
+        if self.wrote_word == self.word_to_write:
+            yield self.set_wrote_word("")
+            time_taken = time() - self.time_on_word
+            readable_time_taken = f"{time_taken % 60:.2f}s"
+            self.results.append(
+                {"word": self.word_to_write, "time_taken": readable_time_taken}
+            )
+            self.set_word_to_write()
+            self.time_on_word = time()
 
-        if event.key:
-            print(event.key)
+    @rx.event
+    def start_game(self):
+        if not self.validate_inputs():
+            return
+        self.results = []
+        self.game_doing = True
+        self.set_word_to_write()
+        self.start_time = time()
+        self.time_on_word = time()
 
-        while True:
-            random_char = chr(random.randint(97, 122))
-            self.set_key_to_press(random_char)
-            print(Fore.CYAN + "\nType " + str(random_char) + Style.RESET_ALL)
-            duration = time()
-            pressed_char = "a"
-            duration = time() - duration
-
-            if time() >= test_start + self.duration:
-                break
-            # inputs.append(Input(random_char, pressed_char, duration))
-
-            if random_char == pressed_char:
-                print(
-                    "\nYou typed "
-                    + Fore.GREEN
-                    + pressed_char
-                    + Style.RESET_ALL
-                    + ". "
-                    + "Correct!"
-                )
-                number_of_hits += 1
-                number_of_types += 1
-                time_c += duration
-            elif pressed_char == "140":
-                self.reset_game()
-            else:
-                print(
-                    "\nYou typed "
-                    + Fore.RED
-                    + pressed_char
-                    + Style.RESET_ALL
-                    + ". "
-                    + "Wrong!"
-                )
-                number_of_misses += 1
-                number_of_types += 1
-                time_w += duration
-
-        test_duration = time_w + time_c
-        self.set_warning(
-            True,
-            "green",
-            "check-circle",
-            f"Game Over! Hits: {number_of_hits}, Misses: {number_of_misses}, Duration: {test_duration:.2f}s",
-            "green",
-        )
+    @rx.event
+    def end_game(self):
         self.game_doing = False
-
-    # @rx.event
-    # def key_pressed(self, event):
-    #     random_char = self.get_random_char()
-    #     self.set_key_to_press(random_char)
-    #     print(Fore.CYAN + "\nType " + str(random_char) + Style.RESET_ALL)
-    #     duration = time.time()
-    #     pressed_char = event.char
-    #     duration = time.time() - duration
-
-    #     if time.time() >= self.test_start + self.duration:
-    #         return
-    #     self.inputs.append(Input(random_char, pressed_char, duration))
-
-    #     if random_char == pressed_char:
-    #         print(
-    #             "\nYou typed "
-    #             + Fore.GREEN
-    #             + pressed_char
-    #             + Style.RESET_ALL
-    #             + ". "
-    #             + "Correct!"
-    #         )
-    #         self.number_of_hits += 1
-    #         self.number_of_types += 1
-    #         self.time_c += duration
-    #     elif pressed_char == "140":
-    #         self.reset_game()
-    #     else:
-    #         print(
-    #             "\nYou typed "
-    #             + Fore.RED
-    #             + pressed_char
-    #             + Style.RESET_ALL
-    #             + ". "
-    #             + "Wrong!"
-    #         )
-    #         self.number_of_misses += 1
-    #         self.number_of_types += 1
-    #         self.time_w += duration
-
-    def get_random_char(self):
-        return random.choice("abcdefghijklmnopqrstuvwxyz")
+        self.show_results = True
 
 
 def game_form() -> rx.Component:
@@ -192,56 +134,74 @@ def game_form() -> rx.Component:
             rx.hstack(
                 render_instructions_card(),
                 rx.card(
-                    rx.text(
-                        GameFormState.key_to_press,
-                        align="center",
-                        spacing="1",
-                        width="15em",
-                        height="5em",
-                        font_size="3em",
-                        font_weight="bold",
-                    )
+                    rx.vstack(
+                        rx.text(
+                            GameFormState.word_to_write,
+                            spacing="1",
+                            font_size="3em",
+                            font_weight="bold",
+                            align="center",
+                        ),
+                        rx.input(
+                            value=GameFormState.wrote_word,
+                            on_change=GameFormState.check_answer,
+                            disabled=~GameFormState.game_doing,
+                            placeholder="write here",
+                            font_size="2em",
+                            align="center",
+                        ),
+                    ),
+                    align="center",
+                    height="100%",
+                    width="100%",
                 ),
                 rx.vstack(
                     rx.card(
                         rx.grid(
-                            rx.text("Number of letters"),
-                            rx.input(
-                                value=GameFormState.letters,
-                                on_change=GameFormState.set_maximum_value,
-                                type="number",
-                                max_width="10em",
+                            rx.text("Difficulty"),
+                            rx.select(
+                                ["Easy", "Medium", "Hard"],
+                                value=GameFormState.difficulty,
+                                on_change=GameFormState.set_difficulty,
+                                disabled=GameFormState.game_doing,
                             ),
                             rx.text("Duration"),
-                            rx.input(
+                            rx.select(
+                                ["10", "30", "60", "90", "120"],
                                 value=GameFormState.duration,
                                 on_change=GameFormState.set_duration,
-                                type="number",
-                                max_width="10em",
+                                disabled=GameFormState.game_doing,
                             ),
                             class_name="grid-cols-[repeat(2,max-content)]",
                             align="center",
                             spacing="1",
+                        ),
+                        height="100%",
+                        width="100%",
+                    ),
+                    rx.card(
+                        rx.hstack(
+                            rx.button(
+                                "Start",
+                                variant="solid",
+                                on_click=GameFormState.start_game,
+                                loading=GameFormState.game_doing,
+                            ),
+                            rx.button(
+                                "Reset",
+                                variant="solid",
+                                on_click=GameFormState.reset_game,
+                            ),
                         )
                     ),
-                    rx.button(
-                        "Start",
-                        variant="solid",
-                        on_click=GameFormState.set_key_to_press(
-                            "Press any key to start"
-                        ),
-                        loading=GameFormState.game_doing,
-                    ),
-                    rx.button(
-                        "Reset",
-                        variant="solid",
-                        on_click=GameFormState.reset_game,
-                    ),
-                    rx.input(
-                        type="hidden",
-                        on_key_down=GameFormState.key_pressed,
-                    ),
                 ),
+                height="20em",
+                spacing="1",
+                align="center",
+            ),
+            rx.cond(
+                GameFormState.show_results,
+                render_results_card(GameFormState.results),
             ),
             rx.cond(
                 GameFormState.warning_show,
