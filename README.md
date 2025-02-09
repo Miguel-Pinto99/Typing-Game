@@ -11,44 +11,34 @@ https://github.com/user-attachments/assets/f5adc3b6-4f86-4835-9fc8-51bdfaf0ffb0
 - Real-time typing feedback
 - Score tracking
 
-## Pre-commit Hook Setup
-To ensure code quality and consistency, we use pre-commit hooks. Follow these steps to set them up:
+## Tools and Libraries
+This project utilizes the following tools and libraries:
 
-1. Install pre-commit:
-    ```bash
-    pip install pre-commit
-    ```
-2. Navigate to the project directory and install the hooks:
-    ```bash
-    pre-commit install
-    ```
-3. Run the hooks on all files:
-    ```bash
-    pre-commit run --all-files
-    ```
+- **Reflex**: A framework for building reactive web applications. [Reflex Documentation](https://reflex.dev/docs)
+- **UV**: A Python library for running applications. [UV Documentation](https://docs.astral.sh/uv/getting-started/installation/)
+- **pre-commit**: A framework for managing and maintaining multi-language pre-commit hooks. [pre-commit Documentation](https://pre-commit.com)
 
-## UV Python Integration
-This project uses UV for running the application. Make sure you have UV installed:
-
+## Installation
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Miguel-Pinto99/Typing-Game.git
+    ```
 1. Install UV:
     ```bash
     pip install uv
     ```
 
-## Installation
-1. Clone the repository:
-
-2. Navigate to the project directory:
+1. Navigate to the project directory:
     ```bash
     cd Typing-Game
     ```
-3. To start the app, use:
+1. To start the app, use:
     ```bash
     uvx reflex run
     ```
 
 ## Usage
-1. Enter the game's difficulty.
+1. Enter the game difficulty.
 2. Enter the duration for the game (in seconds).
 3. Click 'Start Game' to begin.
 4. Type the displayed word as quickly and accurately as possible.
