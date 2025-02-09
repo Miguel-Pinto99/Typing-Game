@@ -2,6 +2,10 @@
 ## Description
 Typing-Game is a fun and interactive game designed to improve your typing speed and accuracy. Challenge yourself and see how fast you can type!
 
+
+https://github.com/user-attachments/assets/f5adc3b6-4f86-4835-9fc8-51bdfaf0ffb0
+
+
 ## Features
 - Multiple difficulty levels
 - Real-time typing feedback
