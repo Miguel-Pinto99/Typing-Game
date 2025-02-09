@@ -48,7 +48,7 @@ This project uses UV for running the application. Make sure you have UV installe
     ```
 
 ## Usage
-1. Enter the number of letters you want to type.
+1. Enter the game's difficulty.
 2. Enter the duration for the game (in seconds).
 3. Click 'Start Game' to begin.
 4. Type the displayed word as quickly and accurately as possible.
