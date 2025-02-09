@@ -114,7 +114,7 @@ class GameFormState(rx.State):
             return
 
         if self.wrote_word == self.word_to_write:
-            yield self.set_wrote_word("")
+            self.wrote_word = ""
             time_taken = time() - self.time_on_word
             readable_time_taken = f"{time_taken % 60:.2f}s"
             self.results.append(
@@ -128,6 +128,8 @@ class GameFormState(rx.State):
         if not self.validate_inputs():
             return
         self.results = []
+        self.show_results = False
+        self.wrote_word = ""
         self.game_doing = True
         self.set_word_to_write()
         self.start_time = time()
@@ -136,6 +138,7 @@ class GameFormState(rx.State):
 
     @rx.event
     def end_game(self):
+        self.wrote_word = ""
         self.game_doing = False
         self.show_results = True
 
