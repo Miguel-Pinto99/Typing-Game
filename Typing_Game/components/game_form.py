@@ -32,14 +32,6 @@ class GameFormState(rx.State):
     results: list[dict] = []
     show_results: bool = False
 
-    # @rx.background
-    # async def countdown(self):
-    #     if time() - self.start_time >= int(self.duration):
-    #         while self.countdown_second > 0:
-    #             async with self:
-    #                 self.countdown_second -= 1
-    #             await asyncio.sleep(1)
-
     @rx.event
     def set_difficulty(self, value: str):
         self.difficulty = value
