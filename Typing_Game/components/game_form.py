@@ -1,5 +1,12 @@
 import reflex as rx
-from .sections import render_warning_card, render_instructions_card, render_results_card
+from .sections import (
+    render_options_card,
+    render_btns_card,
+    render_warning_card,
+    render_instructions_card,
+    render_results_card,
+    render_words_card,
+)
 import random
 from time import time
 from ..data.words import easy_words, medium_words, hard_words
@@ -133,69 +140,11 @@ def game_form() -> rx.Component:
         rx.vstack(
             rx.hstack(
                 render_instructions_card(),
-                rx.card(
-                    rx.vstack(
-                        rx.text(
-                            GameFormState.word_to_write,
-                            spacing="1",
-                            font_size="3em",
-                            font_weight="bold",
-                            align="center",
-                        ),
-                        rx.input(
-                            value=GameFormState.wrote_word,
-                            on_change=GameFormState.check_answer,
-                            disabled=~GameFormState.game_doing,
-                            placeholder="write here",
-                            font_size="2em",
-                            align="center",
-                        ),
-                    ),
-                    align="center",
-                    height="100%",
-                    width="100%",
-                ),
+                render_words_card(GameFormState),
                 rx.vstack(
-                    rx.card(
-                        rx.grid(
-                            rx.text("Difficulty"),
-                            rx.select(
-                                ["Easy", "Medium", "Hard"],
-                                value=GameFormState.difficulty,
-                                on_change=GameFormState.set_difficulty,
-                                disabled=GameFormState.game_doing,
-                            ),
-                            rx.text("Duration"),
-                            rx.select(
-                                ["10", "30", "60", "90", "120"],
-                                value=GameFormState.duration,
-                                on_change=GameFormState.set_duration,
-                                disabled=GameFormState.game_doing,
-                            ),
-                            class_name="grid-cols-[repeat(2,max-content)]",
-                            align="center",
-                            spacing="1",
-                        ),
-                        height="100%",
-                        width="100%",
-                    ),
-                    rx.card(
-                        rx.hstack(
-                            rx.button(
-                                "Start",
-                                variant="solid",
-                                on_click=GameFormState.start_game,
-                                loading=GameFormState.game_doing,
-                            ),
-                            rx.button(
-                                "Reset",
-                                variant="solid",
-                                on_click=GameFormState.reset_game,
-                            ),
-                        )
-                    ),
+                    render_options_card(GameFormState), render_btns_card(GameFormState)
                 ),
-                height="20em",
+                height="35em",
                 spacing="1",
                 align="center",
             ),

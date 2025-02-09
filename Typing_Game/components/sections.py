@@ -69,8 +69,89 @@ def render_instructions_card():
                 align="left",
                 spacing="1",
                 height="100%",
-                width="100%",
             ),
+        ),
+    )
+
+
+def render_btns_card(state: rx.State) -> rx.Component:
+    return (
+        rx.card(
+            rx.hstack(
+                rx.button(
+                    "Start",
+                    variant="solid",
+                    on_click=state.start_game,
+                    loading=state.game_doing,
+                ),
+                rx.button(
+                    "Reset",
+                    variant="solid",
+                    on_click=state.reset_game,
+                ),
+                align="center",
+                justify="center",
+            ),
+            align="center",
+            justify="between",
+            width="15em",
+        ),
+    )
+
+
+def render_words_card(state: rx.State) -> rx.Component:
+    return (
+        rx.card(
+            rx.vstack(
+                rx.text(
+                    state.word_to_write,
+                    spacing="1",
+                    font_size="3em",
+                    font_weight="bold",
+                    align="center",
+                ),
+                rx.input(
+                    value=state.wrote_word,
+                    on_change=state.check_answer,
+                    disabled=~state.game_doing,
+                    placeholder="write here",
+                    font_size="2em",
+                    align="center",
+                ),
+            ),
+            align="center",
+            height="100%",
+            width="100%",
+        ),
+    )
+
+
+def render_options_card(state: rx.State) -> rx.Component:
+    return rx.vstack(
+        rx.card(
+            rx.grid(
+                rx.text("Difficulty"),
+                rx.select(
+                    ["Easy", "Medium", "Hard"],
+                    value=state.difficulty,
+                    on_change=state.set_difficulty,
+                    disabled=state.game_doing,
+                    width="10em",
+                ),
+                rx.text("Duration"),
+                rx.select(
+                    ["10", "30", "60", "90", "120"],
+                    value=state.duration,
+                    on_change=state.set_duration,
+                    disabled=state.game_doing,
+                    width="10em",
+                ),
+                class_name="grid-cols-[repeat(2,max-content)]",
+                align="center",
+                spacing="1",
+            ),
+            height="100%",
+            width="15em",
         ),
     )
 
@@ -91,5 +172,6 @@ def render_results_card(results: list[dict]) -> rx.Component:
                 align="center",
                 spacing="1",
             ),
-        )
+        ),
+        height="100%",
     )
