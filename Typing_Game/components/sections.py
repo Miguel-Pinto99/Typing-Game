@@ -51,7 +51,7 @@ def render_instructions_card():
             rx.divider(),
             rx.spacer(height="10px"),
             rx.list.ordered(
-                rx.list.item("Enter the number of letters you want to type."),
+                rx.list.item("Enter the game difficulty."),
                 rx.spacer(height="10px"),
                 rx.list.item("Enter the duration for the game (in seconds)."),
                 rx.spacer(height="10px"),
