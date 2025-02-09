@@ -6,7 +6,6 @@ from .components.game_form import game_form
 
 
 def index() -> rx.Component:
-    # Welcome Page (Index)
     return rx.vstack(
         header(),
         game_form(),
@@ -15,4 +14,4 @@ def index() -> rx.Component:
 
 
 app = rx.App()
-app.add_page(index)
+app.add_page(index, title="Typing Game")

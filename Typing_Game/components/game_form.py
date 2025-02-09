@@ -6,15 +6,18 @@ from .sections import (
     render_instructions_card,
     render_results_card,
     render_words_card,
+    render_time_text,
 )
 import random
 from time import time
+from asyncio import sleep
 from ..data.words import easy_words, medium_words, hard_words
 
 
 class GameFormState(rx.State):
     difficulty: str = ""
     duration: str = "0"
+    remaining_time: int = 0
 
     game_doing: bool = False
     icon_color: str = ""
@@ -28,6 +31,14 @@ class GameFormState(rx.State):
     time_on_word: float = 0
     results: list[dict] = []
     show_results: bool = False
+
+    # @rx.background
+    # async def countdown(self):
+    #     if time() - self.start_time >= int(self.duration):
+    #         while self.countdown_second > 0:
+    #             async with self:
+    #                 self.countdown_second -= 1
+    #             await asyncio.sleep(1)
 
     @rx.event
     def set_difficulty(self, value: str):
@@ -87,6 +98,7 @@ class GameFormState(rx.State):
         self.time_on_word = 0
         self.results = []
         self.show_results = False
+        self.remaining_time = 0
 
     @rx.event
     def validate_inputs(self) -> bool:
@@ -128,11 +140,24 @@ class GameFormState(rx.State):
         self.set_word_to_write()
         self.start_time = time()
         self.time_on_word = time()
+        self.remaining_time = int(self.duration)
 
     @rx.event
     def end_game(self):
         self.game_doing = False
         self.show_results = True
+
+    @rx.event(background=True)
+    async def update_time(self):
+        while self.game_doing:
+            if time() - self.start_time >= int(self.duration):
+                async with self:
+                    self.end_game()
+                break
+            else:
+                async with self:
+                    self.remaining_time = round(self.remaining_time - 0.1, 1)
+                await sleep(0.1)
 
 
 def game_form() -> rx.Component:
@@ -147,6 +172,10 @@ def game_form() -> rx.Component:
                 height="35em",
                 spacing="1",
                 align="center",
+            ),
+            rx.cond(
+                GameFormState.game_doing,
+                render_time_text(GameFormState),
             ),
             rx.cond(
                 GameFormState.show_results,

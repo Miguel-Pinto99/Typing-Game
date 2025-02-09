@@ -75,54 +75,66 @@ def render_instructions_card():
 
 
 def render_btns_card(state: rx.State) -> rx.Component:
-    return (
-        rx.card(
-            rx.hstack(
-                rx.button(
-                    "Start",
-                    variant="solid",
-                    on_click=state.start_game,
-                    loading=state.game_doing,
-                ),
-                rx.button(
-                    "Reset",
-                    variant="solid",
-                    on_click=state.reset_game,
-                ),
-                align="center",
-                justify="center",
+    return rx.card(
+        rx.hstack(
+            rx.button(
+                "Start",
+                variant="solid",
+                on_click=[state.start_game, state.update_time],
+                loading=state.game_doing,
+            ),
+            rx.button(
+                "Reset",
+                variant="solid",
+                on_click=state.reset_game,
             ),
             align="center",
-            justify="between",
-            width="15em",
+            justify="center",
         ),
+        align="center",
+        justify="between",
+        width="15em",
+    )
+
+
+def render_time_text(state: rx.State) -> rx.Component:
+    return rx.text(
+        f"Time remaining: {state.remaining_time}",
+        font_size="1.5em",
+        color="gray",
     )
 
 
 def render_words_card(state: rx.State) -> rx.Component:
-    return (
-        rx.card(
-            rx.vstack(
-                rx.text(
-                    state.word_to_write,
-                    spacing="1",
-                    font_size="3em",
-                    font_weight="bold",
-                    align="center",
-                ),
-                rx.input(
-                    value=state.wrote_word,
-                    on_change=state.check_answer,
-                    disabled=~state.game_doing,
-                    placeholder="write here",
-                    font_size="2em",
-                    align="center",
-                ),
+    return rx.card(
+        rx.grid(
+            rx.text(
+                state.word_to_write,
+                spacing="1",
+                font_size="3em",
+                font_weight="bold",
+                align="center",
+                justify="center",
             ),
-            align="center",
-            height="100%",
+            rx.input(
+                value=state.wrote_word,
+                on_change=state.check_answer,
+                disabled=~state.game_doing,
+                placeholder="write here",
+                text_align="center",
+                font_size="2em",
+                align="center",
+            ),
+            class_name="grid-rows-[repeat(2,50%)]",
             width="100%",
+            justify="center",
+            align="center",
+            height="30em",
         ),
+        height="27.5em",
+        width="100%",
+        justify="center",
+        align="center",
     )
 
 
